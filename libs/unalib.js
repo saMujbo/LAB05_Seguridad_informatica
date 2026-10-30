@@ -1,111 +1,53 @@
-// modulo de ejemplo.
+'use strict';
+
+// Classify URLs without converting user input into executable HTML.
+function classifyMedia(value) {
+  if (typeof value !== 'string' || /[\s<>"'`\x00-\x1f]/.test(value)) return null;
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return null;
+    const path = decodeURIComponent(url.pathname);
+    if (/[<>"'`\x00-\x1f]/.test(path)) return null;
+    if (/\.(png|jpe?g|gif|webp|bmp)$/i.test(path)) return { tipo: 'imagen', url: url.href };
+    if (/\.(mp4|webm|ogg)$/i.test(path)) return { tipo: 'video', url: url.href };
+    if (['youtube.com', 'www.youtube.com', 'youtu.be'].includes(url.hostname)) {
+      const id = url.hostname === 'youtu.be' ? url.pathname.slice(1) : url.searchParams.get('v');
+      if (/^[\w-]{11}$/.test(id || '')) return { tipo: 'youtube', url: `https://www.youtube-nocookie.com/embed/${id}` };
+    }
+  } catch { /* Malformed URL or percent encoding. */ }
+  return null;
+}
+
+function validarMensaje(raw) {
+  try {
+    if (typeof raw !== 'string' || raw.length > 10000) throw Error('Formato inválido');
+    const message = JSON.parse(raw);
+    if (!message || typeof message.mensaje !== 'string' || !message.mensaje.trim() || message.mensaje.length > 4000) throw Error('Mensaje inválido');
+    const text = message.mensaje.trim();
+    // Reject markup and dangerous schemes; the frontend also renders plain text safely.
+    if (/[<>]|&(?:lt|gt|#0*60|#x0*3c);|\b(?:javascript|data|vbscript)\s*:/i.test(text)) throw Error('Contenido no permitido');
+    const media = classifyMedia(text);
+    if (!media && /(?:https?:\/\/|www\.|^[a-z][a-z0-9+.-]*:)/i.test(text)) throw Error('URL no permitida');
+    return JSON.stringify({
+      ok: true,
+      nombre: typeof message.nombre === 'string' ? message.nombre.slice(0, 80) : 'Anónimo',
+      mensaje: text,
+      color: /^#[0-9a-f]{6}$/i.test(message.color) ? message.color : '#166534',
+      tipo: media?.tipo || 'texto',
+      ...(media ? { url: media.url } : {})
+    });
+  } catch (error) {
+    return JSON.stringify({ ok: false, error: error.message || 'Entrada inválida' });
+  }
+}
 
 module.exports = {
-
-
-    // logica que valida si un telefono esta correcto...
-    is_valid_phone: function (phone) {
-      // inicializacion lazy
-      var isValid = false;
-      // expresion regular copiada de StackOverflow
-      var re = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/i;
-  
-      // validacion Regex
-      try {
-        isValid = re.test(phone);
-      } catch (e) {
-        console.log(e);
-      } finally {
-          return isValid;
-      }
-      // fin del try-catch block
-    },
-  
-    is_valid_url_image: function (url) {
-  
-      // inicializacion lazy
-      var isValid = false;
-      // expresion regular copiada de StackOverflow
-      var re = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg|bmp)/i;
-  
-      // validacion Regex
-      try {
-        isValid = re.test(phone);
-      } catch (e) {
-        console.log(e);
-      } finally {
-          return isValid;
-      }
-      // fin del try-catch block
-    },
-  
-    is_valid_yt_video: function (url) {
-  
-      // inicializacion lazy
-      var isValid = false;
-      // expresion regular copiada de StackOverflow
-      var re = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})?$/i;
-  
-      // validacion Regex
-      try {
-        isValid = re.test(phone);
-      } catch (e) {
-        console.log(e);
-      } finally {
-          return isValid;
-      }
-      // fin del try-catch block
-    },
-  
-    getYTVideoId: function(url){
-  
-      return url.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1];
-    },
-  
-    getEmbeddedCode: function (url){
-      var id = this.getYTVideoId(url);
-      var code = '<iframe width="560" height="315" src="https://www.youtube.com/embed/'+id+ '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-      return code;
-    },
-  
-    getImageTag: function(url){
-      var tag = '<img src="'+url+'" style="max-height: 400px;max-width: 400px;">';
-      return tag;
-    },
-  
-    validateMessage: function(msg){
-      // Handle invalid input
-      if (!msg || typeof msg !== 'string') {
-        return JSON.stringify({ mensaje: '' });
-      }
-
-      try {
-        var obj = JSON.parse(msg);
-  
-      if(this.is_valid_url_image(obj.mensaje)){
-        console.log("Es una imagen!")
-        obj.mensaje = this.getImageTag(obj.mensaje);
-      }
-      else if(this.is_valid_yt_video(obj.mensaje)){
-        console.log("Es un video!")
-        obj.mensaje = this.getEmbeddedCode(obj.mensaje);
-      }
-      else{
-        console.log("Es un texto!")
-      }
-      
-      return JSON.stringify(obj);
-      } catch (e) {
-        console.log('Error processing message:', e);
-        return JSON.stringify({ mensaje: msg }); // Return original message on error
-      }
-    }
-  
-  
-  
-    
-    
-  
-  // fin del modulo
-  };
-  
+  is_valid_phone: value => typeof value === 'string' && /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/.test(value),
+  is_valid_url_image: value => classifyMedia(value)?.tipo === 'imagen',
+  is_valid_video: value => classifyMedia(value)?.tipo === 'video',
+  is_valid_yt_video: value => classifyMedia(value)?.tipo === 'youtube',
+  getYTVideoId: value => { const media = classifyMedia(value); return media?.tipo === 'youtube' ? media.url.split('/').pop() : null; },
+  classifyMedia,
+  validarMensaje,
+  validateMessage: validarMensaje
+};
