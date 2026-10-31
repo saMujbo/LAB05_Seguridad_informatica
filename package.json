@@ -6,7 +6,7 @@
     "socket.io": "*"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node --require ./instrument.js server.js",
     "test": "mocha \"test/**/*.js\"",
     "test:integration": "jest tests/integration --runInBand --env=node",
     "test:e2e": "playwright test --project=chromium --headed"
