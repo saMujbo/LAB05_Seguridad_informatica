@@ -5,25 +5,6 @@ const validation = require('./libs/unalib');
 
 function createChatServer() {
   const app = express();
-  // Ruta temporal para verificar la recepción de errores en Sentry.
-  app.get('/debug-sentry', (req, res) => {
-    if (
-      !process.env.SENTRY_TEST_TOKEN ||
-      req.get('x-test-token') !== process.env.SENTRY_TEST_TOKEN
-    ) {
-      return res.sendStatus(404);
-    }
-
-    const Sentry = require('@sentry/node');
-    Sentry.captureException(
-      new Error('Error controlado - Laboratorio UNA Chat')
-    );
-
-    res.status(500).json({
-      message: 'Error de prueba enviado a Sentry'
-    });
-  });
-
   app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; connect-src 'self' ws: wss:; img-src 'self' http: https:; media-src 'self' http: https:; frame-src https://www.youtube-nocookie.com; style-src 'self'; object-src 'none'; base-uri 'none'");
     res.setHeader('X-Content-Type-Options', 'nosniff');
