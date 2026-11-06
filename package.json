@@ -1,5 +1,16 @@
 {
   "dependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/api-logs": "0.223.0",
+    "@opentelemetry/exporter-logs-otlp-proto": "0.223.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "0.223.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.223.0",
+    "@opentelemetry/instrumentation-express": "0.71.0",
+    "@opentelemetry/instrumentation-http": "0.223.0",
+    "@opentelemetry/resources": "2.12.0",
+    "@opentelemetry/sdk-logs": "0.223.0",
+    "@opentelemetry/sdk-metrics": "2.12.0",
+    "@opentelemetry/sdk-node": "0.223.0",
     "@sentry/node": "^11.10.0",
     "express": "*",
     "mocha": "^10.2.0",
@@ -7,7 +18,9 @@
   },
   "scripts": {
     "start": "node --require ./instrument.js server.js",
+    "start:grafana": "node --env-file=.env.grafana --require ./telemetry.js server.js",
     "test": "mocha \"test/**/*.js\"",
+    "test:telemetry": "node tests/telemetry/verify.js",
     "test:integration": "jest tests/integration --runInBand --env=node",
     "test:e2e": "playwright test --project=chromium --headed"
   },

@@ -7,6 +7,9 @@ Repositorio: https://github.com/saMujbo/LAB05_Seguridad_informatica
 Requiere Node.js y npm. Instalar dependencias con `npm ci` y ejecutar `npm start`.
 Abrir http://127.0.0.1:3000. El mismo servidor sirve el frontend y el backend Socket.IO.
 
+Para logs, métricas y trazas locales por OTLP, ver [GRAFANA.md](GRAFANA.md).
+El comando `npm run start:grafana` usa una configuración separada de Sentry/Render.
+
 ## Pruebas separadas
 
 - Unitarias originales y nuevas: `npm test` (Mocha, carpeta test).
