@@ -3,13 +3,17 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UNA Chat Laboratorio 05</title><link rel="stylesheet" href="/assets/chat.css"></head>
 <body><main>
   <h1>UNA Chat</h1><p>Laboratorio 05 · Seguridad Informática</p>
+  <section id="auth" aria-live="polite">
+    <button id="login" type="button">Iniciar sesión</button>
+    <button id="logout" type="button" hidden>Cerrar sesión</button>
+    <span id="user"></span>
+  </section>
   <p id="connection" role="status">Conectando al servidor</p>
   <ul id="messages" aria-label="Mensajes del chat"></ul>
   <p id="error" role="alert"></p>
   <form>
-    <label>Nombre<input id="nombre" placeholder="Username" maxlength="80"></label>
     <label>Mensaje o URL de imagen o video<input id="m" placeholder="Escriba un mensaje" maxlength="4000" required></label>
     <button type="submit">Enviar</button>
   </form>
-</main><script src="/socket.io/socket.io.js"></script><script src="/assets/chat.js"></script></body>
+</main><script src="/auth-config.js"></script><script src="/socket.io/socket.io.js"></script><script type="module" src="/assets/chat.js"></script></body>
 </html>

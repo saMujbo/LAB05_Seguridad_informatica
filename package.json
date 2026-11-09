@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@auth0/auth0-react": "^2.30.0",
+    "@auth0/auth0-spa-js": "^2.30.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/api-logs": "0.223.0",
     "@opentelemetry/exporter-logs-otlp-proto": "0.223.0",
@@ -12,11 +14,16 @@
     "@opentelemetry/sdk-metrics": "2.12.0",
     "@opentelemetry/sdk-node": "0.223.0",
     "@sentry/node": "^11.10.0",
+    "dotenv": "^18.0.9",
     "express": "*",
+    "express-openid-connect": "^2.20.2",
+    "jose": "^6.2.15",
     "mocha": "^10.2.0",
+    "pg": "^8.23.1",
     "socket.io": "*"
   },
   "scripts": {
+    "dev": "node --watch --import ./instrument.js server.js",
     "start": "node --require ./instrument.js server.js",
     "start:grafana": "node --env-file=.env.grafana --require ./telemetry.js server.js",
     "test": "mocha \"test/**/*.js\"",

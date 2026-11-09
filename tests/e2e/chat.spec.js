@@ -20,8 +20,7 @@ test('script bloqueado sin alert ni difusión', async ({ page }) => {
   await page.waitForTimeout(300); expect(dialogs).toEqual([]);
   await page.screenshot({ path: 'evidence/paso05-script-bloqueado.jpg', type: 'jpeg', quality: 92 });
 });
-test('nombre malicioso se muestra como texto', async ({ page }) => {
-  const dialogs = []; page.on('dialog', async dialog => { dialogs.push(dialog.message()); await dialog.dismiss(); });
-  await page.getByPlaceholder('Username').fill('<img src=x onerror=alert(1)>'); await send(page, 'Hola UNA');
-  await expect(page.locator('#messages')).toContainText('<img src=x onerror=alert(1)>'); await expect(page.locator('#messages img')).toHaveCount(0); expect(dialogs).toEqual([]);
+test('la identidad del servidor se muestra en el mensaje', async ({ page }) => {
+  await send(page, 'Hola UNA');
+  await expect(page.locator('#messages')).toContainText('Usuario de prueba:');
 });

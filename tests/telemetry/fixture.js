@@ -1,5 +1,5 @@
 const { createChatServer } = require('../../server');
-const { server, io } = createChatServer();
+const { server, io } = createChatServer({ allowUnauthenticated: true });
 server.listen(0, '127.0.0.1', () => process.send({ port: server.address().port }));
 process.once('message', async () => {
   try {
