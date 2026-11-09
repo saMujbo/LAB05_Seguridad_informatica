@@ -1,0 +1,21 @@
+config:
+  target: 'http://127.0.0.1:3000'
+  phases:
+    - name: Carga sostenida
+      duration: 60
+      arrivalRate: 5
+  socketio:
+    transports: ['websocket']
+    reconnection: false
+
+scenarios:
+  - name: Enviar un mensaje y validar la confirmación
+    engine: socketio
+    flow:
+      - emit:
+          - Evento-Mensaje-Server
+          - '{"mensaje":"Prueba de carga local de UNA Chat"}'
+        acknowledge:
+          match:
+            json: '$.0.ok'
+            value: true
